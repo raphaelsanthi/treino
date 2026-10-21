@@ -229,6 +229,7 @@ const PLAN = [
     { id: "leg-press", loc: "academia", name: "Leg press + Panturrilha no leg press (bi-set)", sets: 3, reps: "8-12", repsParts: ["8-12", "10-15"], muscle: "quadriceps", also: "panturrilha", warmup: 1, rest: 120, biset: ["Leg press", "Panturrilha"], cue: "Leg press e, logo em seguida, a panturrilha na mesma máquina, sem sair. Lombar colada no banco; não trave os joelhos." },
     { id: "mesa-flexora", loc: "academia", name: "Mesa flexora", sets: 3, reps: "8-12", muscle: "posterior", warmup: 0, rest: 90, cue: "Quadril colado no banco. Volte devagar." },
     { id: "extensora", loc: "academia", name: "Cadeira extensora", sets: 3, reps: "8-12", muscle: "quadriceps", warmup: 0, rest: 75, cue: "Segure 1 segundo no topo." },
+    { id: "abd-abd-a", loc: "academia", name: "Cadeira abdutora e adutora", sets: 3, reps: "8-12", muscle: "gluteo", warmup: 0, rest: 75, cue: "Movimento controlado, sem usar impulso." },
     { id: "cardio-a", loc: "academia", name: "Esteira ou bike inclinada", sets: 1, reps: "12 min", muscle: "cardio", warmup: 0, rest: 0, noLoad: true, mins: 12, cue: "Ritmo em que ainda dá para conversar." },
     { id: "agacho-casa", loc: "casa", name: "Agachamento com o peso do corpo", sets: 3, reps: "12-15", muscle: "quadriceps", warmup: 0, rest: 60, noLoad: true, cue: "Sente para trás, como numa cadeira. Joelhos acompanham os pés." },
     { id: "ponte", loc: "casa", name: "Ponte de glúteo", sets: 3, reps: "12-15", muscle: "gluteo", warmup: 0, rest: 60, noLoad: true, cue: "Suba contraindo o glúteo, sem arquear a lombar." },
@@ -264,7 +265,7 @@ function todayStr() {
   const p = (n) => String(n).padStart(2, "0");
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 }
-function formatDate(iso) { return new Date(iso + "T00:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "short" }); }
+function formatDate(iso) { return new Date(iso + "T00:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "short" }).replace(/\.$/, ""); }
 function formatClock(sec) { const m = Math.floor(sec / 60); return `${m}:${String(sec % 60).padStart(2, "0")}`; }
 function fmtKg(n) { return String(n).replace(".", ","); }
 function fmtRest(s) {
