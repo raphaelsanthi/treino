@@ -111,8 +111,11 @@
   .load input::placeholder { color: var(--ivory-50); }
   .load input:focus { border-color: var(--gold); }
   .load .unit { color: var(--ivory-50); font-size: 12px; }
-  .hint { font-size: 12px; color: var(--gold-soft); font-weight: 600; line-height: 1.2; }
+  .hint { font-size: 11.5px; color: var(--gold-soft); font-weight: 600; line-height: 1.2; }
   .hint small { display: block; color: var(--ivory-50); font-weight: 500; font-size: 11px; }
+  .load input.reps { width: 52px; }
+  .load .x { color: var(--ivory-50); font-size: 13px; }
+  .trend { color: var(--gold-soft); font-size: 13px; margin: 6px 0 0; font-weight: 500; }
   .biset { display: flex; flex-wrap: wrap; gap: 8px 12px; }
   .biset .load input { width: 56px; }
   .part { display: flex; flex-direction: column; font-size: 11px; color: var(--ivory-50); line-height: 1.2; max-width: 80px; }
@@ -214,40 +217,46 @@ const LOC_LABEL = { casa: "Em casa", academia: "Na academia" };
    mins: duração fixa em minutos (cardio). warmup: séries leves antes do exercício. */
 const PLAN = [
   { id: "sup-a", label: "Superior A", short: "Sup A", tag: "Empurrar e puxar", exercises: [
-    { id: "supino", loc: "academia", name: "Supino na máquina (ou halteres)", sets: 3, reps: "10-12", muscle: "peito", warmup: 1, rest: 120, cue: "Ombros para trás e para baixo. Desça em 2 segundos." },
-    { id: "puxada", loc: "academia", name: "Puxada na frente (pulley)", sets: 3, reps: "10-12", muscle: "costas", warmup: 1, rest: 120, cue: "Puxe com os cotovelos, sem balançar o tronco." },
-    { id: "desenv", loc: "academia", name: "Desenvolvimento de ombro (máquina)", sets: 2, reps: "10-12", muscle: "ombro", warmup: 0, rest: 90, cue: "Costas apoiadas, sem arquear a lombar." },
-    { id: "remada-baixa", loc: "academia", name: "Remada baixa", sets: 3, reps: "10-12", muscle: "costas", warmup: 0, rest: 90, cue: "Peito aberto e tronco firme. Não puxe com a lombar." },
-    { id: "bi-rosca-triceps", loc: "academia", name: "Rosca direta + Tríceps corda (bi-set)", sets: 2, reps: "12-15", muscle: "braco", warmup: 0, rest: 75, biset: ["Rosca direta", "Tríceps corda"], cue: "Faça um, depois o outro, sem descanso no meio." },
-    { id: "abd-chao", loc: "casa", name: "Abdominal no chão", sets: 2, reps: "15-20", muscle: "abdomen", warmup: 0, rest: 45, noLoad: true, cue: "Suba devagar, sem puxar o pescoço." },
+    { id: "supino", loc: "academia", name: "Supino na máquina (ou halteres)", sets: 3, reps: "8-12", muscle: "peito", warmup: 1, rest: 120, cue: "Ombros para trás e para baixo. Desça em 2 segundos." },
+    { id: "puxada", loc: "academia", name: "Puxada na frente (pulley)", sets: 3, reps: "8-12", muscle: "costas", warmup: 1, rest: 120, cue: "Puxe com os cotovelos, sem balançar o tronco." },
+    { id: "desenv", loc: "academia", name: "Desenvolvimento de ombro (máquina)", sets: 3, reps: "8-12", muscle: "ombro", warmup: 0, rest: 90, cue: "Costas apoiadas, sem arquear a lombar." },
+    { id: "remada-baixa", loc: "academia", name: "Remada baixa", sets: 3, reps: "8-12", muscle: "costas", warmup: 0, rest: 90, cue: "Peito aberto e tronco firme. Não puxe com a lombar." },
+    { id: "bi-rosca-triceps", loc: "academia", name: "Rosca direta + Tríceps corda (bi-set)", sets: 3, reps: "8-12", muscle: "braco", warmup: 0, rest: 75, biset: ["Rosca direta", "Tríceps corda"], cue: "Faça um, depois o outro, sem descanso no meio." },
+    { id: "abd-chao", loc: "casa", name: "Abdominal no chão", sets: 3, reps: "15-20", muscle: "abdomen", warmup: 0, rest: 45, noLoad: true, cue: "Suba devagar, sem puxar o pescoço." },
   ]},
   { id: "inf-a", label: "Inferior A", short: "Inf A", tag: "Perna e cardio", exercises: [
-    { id: "leg-press", loc: "academia", name: "Leg press", sets: 3, reps: "12-15", muscle: "quadriceps", warmup: 1, rest: 120, cue: "Lombar colada no banco. Não trave os joelhos no topo." },
-    { id: "mesa-flexora", loc: "academia", name: "Mesa flexora", sets: 3, reps: "12-15", muscle: "posterior", warmup: 0, rest: 90, cue: "Quadril colado no banco. Volte devagar." },
-    { id: "extensora", loc: "academia", name: "Cadeira extensora", sets: 2, reps: "12-15", muscle: "quadriceps", warmup: 0, rest: 75, cue: "Segure 1 segundo no topo." },
-    { id: "pant-pe", loc: "academia", name: "Panturrilha em pé", sets: 3, reps: "15-20", muscle: "panturrilha", warmup: 0, rest: 60, cue: "Suba até o fim e desça alongando." },
+    { id: "leg-press", loc: "academia", name: "Leg press", sets: 3, reps: "8-12", muscle: "quadriceps", warmup: 1, rest: 120, cue: "Lombar colada no banco. Não trave os joelhos no topo." },
+    { id: "mesa-flexora", loc: "academia", name: "Mesa flexora", sets: 3, reps: "8-12", muscle: "posterior", warmup: 0, rest: 90, cue: "Quadril colado no banco. Volte devagar." },
+    { id: "extensora", loc: "academia", name: "Cadeira extensora", sets: 3, reps: "8-12", muscle: "quadriceps", warmup: 0, rest: 75, cue: "Segure 1 segundo no topo." },
+    { id: "pant-pe", loc: "academia", name: "Panturrilha em pé", sets: 3, reps: "10-15", muscle: "panturrilha", warmup: 0, rest: 60, cue: "Suba até o fim e desça alongando." },
     { id: "cardio-a", loc: "academia", name: "Esteira ou bike inclinada", sets: 1, reps: "12 min", muscle: "cardio", warmup: 0, rest: 0, noLoad: true, mins: 12, cue: "Ritmo em que ainda dá para conversar." },
-    { id: "agacho-casa", loc: "casa", name: "Agachamento com o peso do corpo", sets: 2, reps: "12-15", muscle: "quadriceps", warmup: 0, rest: 60, noLoad: true, cue: "Sente para trás, como numa cadeira. Joelhos acompanham os pés." },
+    { id: "agacho-casa", loc: "casa", name: "Agachamento com o peso do corpo", sets: 3, reps: "12-15", muscle: "quadriceps", warmup: 0, rest: 60, noLoad: true, cue: "Sente para trás, como numa cadeira. Joelhos acompanham os pés." },
     { id: "ponte", loc: "casa", name: "Ponte de glúteo", sets: 3, reps: "12-15", muscle: "gluteo", warmup: 0, rest: 60, noLoad: true, cue: "Suba contraindo o glúteo, sem arquear a lombar." },
   ]},
   { id: "sup-b", label: "Superior B", short: "Sup B", tag: "Empurrar e puxar", exercises: [
-    { id: "supino-inc", loc: "academia", name: "Supino inclinado (máquina)", sets: 3, reps: "10-12", muscle: "peito", warmup: 1, rest: 120, cue: "Cotovelos a 45 graus do corpo." },
-    { id: "remada-maq", loc: "academia", name: "Remada na máquina (peito apoiado)", sets: 3, reps: "10-12", muscle: "costas", warmup: 1, rest: 120, cue: "Peito apoiado poupa a lombar. Junte as escápulas." },
-    { id: "elev-lat", loc: "academia", name: "Elevação lateral", sets: 3, reps: "12-15", muscle: "ombro", warmup: 0, rest: 75, cue: "Carga leve, subida controlada até a altura do ombro." },
-    { id: "puxada-tri", loc: "academia", name: "Puxada triângulo", sets: 2, reps: "10-12", muscle: "costas", warmup: 0, rest: 90, cue: "Leve o peito até a barra." },
-    { id: "bi-triceps-rosca", loc: "academia", name: "Tríceps pulley + Rosca alternada (bi-set)", sets: 2, reps: "12-15", muscle: "braco", warmup: 0, rest: 75, biset: ["Tríceps pulley", "Rosca alternada"], cue: "Faça um, depois o outro, sem descanso no meio." },
-    { id: "abd-obl", loc: "casa", name: "Abdominal oblíquo (bicicleta)", sets: 2, reps: "15-20", muscle: "abdomen", warmup: 0, rest: 45, noLoad: true, cue: "Cotovelo em direção ao joelho oposto, devagar." },
+    { id: "supino-inc", loc: "academia", name: "Supino inclinado (máquina)", sets: 3, reps: "8-12", muscle: "peito", warmup: 1, rest: 120, cue: "Cotovelos a 45 graus do corpo." },
+    { id: "remada-maq", loc: "academia", name: "Remada na máquina (peito apoiado)", sets: 3, reps: "8-12", muscle: "costas", warmup: 1, rest: 120, cue: "Peito apoiado poupa a lombar. Junte as escápulas." },
+    { id: "elev-lat", loc: "academia", name: "Elevação lateral", sets: 3, reps: "8-12", muscle: "ombro", warmup: 0, rest: 75, cue: "Carga leve, subida controlada até a altura do ombro." },
+    { id: "puxada-tri", loc: "academia", name: "Puxada triângulo", sets: 3, reps: "8-12", muscle: "costas", warmup: 0, rest: 90, cue: "Leve o peito até a barra." },
+    { id: "bi-triceps-rosca", loc: "academia", name: "Tríceps pulley + Rosca alternada (bi-set)", sets: 3, reps: "8-12", muscle: "braco", warmup: 0, rest: 75, biset: ["Tríceps pulley", "Rosca alternada"], cue: "Faça um, depois o outro, sem descanso no meio." },
+    { id: "abd-obl", loc: "casa", name: "Abdominal oblíquo (bicicleta)", sets: 3, reps: "15-20", muscle: "abdomen", warmup: 0, rest: 45, noLoad: true, cue: "Cotovelo em direção ao joelho oposto, devagar." },
   ]},
   { id: "inf-b", label: "Inferior B", short: "Inf B", tag: "Perna e cardio", exercises: [
-    { id: "agacho-smith", loc: "academia", name: "Agachamento no smith ou hack", sets: 3, reps: "10-12", muscle: "quadriceps", warmup: 1, rest: 120, cue: "Desça até onde mantém a coluna neutra." },
-    { id: "abd-abd", loc: "academia", name: "Cadeira abdutora e adutora", sets: 2, reps: "15", muscle: "gluteo", warmup: 0, rest: 75, cue: "Movimento controlado, sem usar impulso." },
-    { id: "cad-flexora", loc: "academia", name: "Cadeira flexora", sets: 3, reps: "12-15", muscle: "posterior", warmup: 0, rest: 90, cue: "Volte devagar, 2 a 3 segundos." },
-    { id: "pant-sent", loc: "academia", name: "Panturrilha sentado", sets: 3, reps: "15-20", muscle: "panturrilha", warmup: 0, rest: 60, cue: "Pausa de 1 segundo embaixo e em cima." },
+    { id: "agacho-smith", loc: "academia", name: "Agachamento no smith ou hack", sets: 3, reps: "8-12", muscle: "quadriceps", warmup: 1, rest: 120, cue: "Desça até onde mantém a coluna neutra." },
+    { id: "abd-abd", loc: "academia", name: "Cadeira abdutora e adutora", sets: 3, reps: "8-12", muscle: "gluteo", warmup: 0, rest: 75, cue: "Movimento controlado, sem usar impulso." },
+    { id: "cad-flexora", loc: "academia", name: "Cadeira flexora", sets: 3, reps: "8-12", muscle: "posterior", warmup: 0, rest: 90, cue: "Volte devagar, 2 a 3 segundos." },
+    { id: "pant-sent", loc: "academia", name: "Panturrilha sentado", sets: 3, reps: "10-15", muscle: "panturrilha", warmup: 0, rest: 60, cue: "Pausa de 1 segundo embaixo e em cima." },
     { id: "cardio-b", loc: "academia", name: "Bike ou elíptico", sets: 1, reps: "12 min", muscle: "cardio", warmup: 0, rest: 0, noLoad: true, mins: 12, cue: "Ritmo em que ainda dá para conversar." },
-    { id: "prancha", loc: "casa", name: "Prancha", sets: 2, reps: "30-45 s", muscle: "abdomen", warmup: 0, rest: 45, noLoad: true, cue: "Corpo em linha reta. Se a lombar cair, encerre a série." },
-    { id: "elev-pernas", loc: "casa", name: "Elevação de pernas (deitado)", sets: 2, reps: "12-15", muscle: "abdomen", warmup: 0, rest: 45, noLoad: true, cue: "Lombar no chão. Desça devagar." },
+    { id: "prancha", loc: "casa", name: "Prancha", sets: 3, reps: "30-45 s", muscle: "abdomen", warmup: 0, rest: 45, noLoad: true, cue: "Corpo em linha reta. Se a lombar cair, encerre a série." },
+    { id: "elev-pernas", loc: "casa", name: "Elevação de pernas (deitado)", sets: 3, reps: "12-15", muscle: "abdomen", warmup: 0, rest: 45, noLoad: true, cue: "Lombar no chão. Desça devagar." },
   ]},
 ];
+
+/* aquecimento: 1 série leve no primeiro exercício de cada grupo muscular do dia */
+PLAN.forEach((day) => {
+  const seen = {};
+  day.exercises.forEach((ex) => { ex.warmup = (!ex.noLoad && !seen[ex.muscle]) ? 1 : 0; seen[ex.muscle] = true; });
+});
 
 /* ---------- Funções auxiliares ---------- */
 function todayStr() {
@@ -269,6 +278,35 @@ const checkKey = (dayId, exId, setIdx) => `${dayId}|${exId}|s${setIdx}`;
 const warmKey = (dayId, exId, i) => `${dayId}|${exId}|w${i}`;
 const loadKey = (dayId, exId, setIdx, part) => `${dayId}|${exId}|${setIdx}${part === undefined ? "" : "|b" + part}`;
 const lastKey = (exId, setIdx, part) => `${exId}|${setIdx}${part === undefined ? "" : "|b" + part}`;
+
+function repRange(ex) {
+  const m = /(\d+)\s*-\s*(\d+)/.exec(ex.reps || "");
+  return m ? [parseInt(m[1], 10), parseInt(m[2], 10)] : [8, 12];
+}
+function stepFor(load) { return load < 20 ? 1 : load < 60 ? 2.5 : 5; }
+/* dupla progressão: bateu o topo da faixa na série mais pesada, sobe; abaixo do piso, reduz; no meio, mantém */
+function exVerdict(ex, lastLoads, lastReps) {
+  if (ex.noLoad || ex.biset) return null;
+  const [lo, hi] = repRange(ex);
+  let top = null;
+  for (let i = 0; i < ex.sets; i++) {
+    const L = toNum(lastLoads[lastKey(ex.id, i)]);
+    const R = toNum(lastReps[lastKey(ex.id, i)]);
+    if (L == null || R == null) continue;
+    if (!top || L >= top.L) top = { L, R };
+  }
+  if (!top) return null;
+  const action = top.R >= hi ? "subir" : top.R < lo ? "diminuir" : "manter";
+  return { action, lo, hi, ...top };
+}
+function targetLoad(verdict, last) {
+  const L = toNum(last);
+  if (L == null || !verdict) return null;
+  const st = stepFor(L);
+  if (verdict.action === "subir") return Math.round((L + st) * 2) / 2;
+  if (verdict.action === "diminuir") return Math.max(0, Math.round((L - st) * 2) / 2);
+  return L;
+}
 
 function dayStats(day, checked) {
   let total = 0, done = 0;
@@ -309,9 +347,10 @@ function groupBlocks(day, first) {
 /* ---------- App ---------- */
 function App() {
   const [loaded, setLoaded] = useState(false);
-  const [data, setData] = useState({ checked: {}, loads: {}, easy: {}, sessions: {} });
+  const [data, setData] = useState({ checked: {}, loads: {}, reps: {}, easy: {}, sessions: {} });
   const [history, setHistory] = useState({});
   const [lastLoads, setLastLoads] = useState({});
+  const [lastReps, setLastReps] = useState({});
   const [lastEasy, setLastEasy] = useState({});
   const [settings, setSettings] = useState({ first: "academia" });
   const [activeDay, setActiveDay] = useState(0);
@@ -334,17 +373,18 @@ function App() {
     if (saved) {
       const d = saved.data || {};
       const sessions = d.sessions || {};
-      const clean = { checked: d.checked || {}, loads: d.loads || {}, easy: d.easy || {}, sessions: { ...sessions } };
+      const clean = { checked: d.checked || {}, loads: d.loads || {}, reps: d.reps || {}, easy: d.easy || {}, sessions: { ...sessions } };
       // descarta sessões de dias anteriores que ficaram abertas
       Object.keys(sessions).forEach((dayId) => {
         if (sessions[dayId].startedOn !== todayStr()) {
-          ["checked", "loads", "easy"].forEach((k) => Object.keys(clean[k]).forEach((key) => { if (key.startsWith(dayId + "|")) delete clean[k][key]; }));
+          ["checked", "loads", "reps", "easy"].forEach((k) => Object.keys(clean[k]).forEach((key) => { if (key.startsWith(dayId + "|")) delete clean[k][key]; }));
           delete clean.sessions[dayId];
         }
       });
       setData(clean);
       hist = saved.history || {};
       setLastLoads(saved.lastLoads || {});
+      setLastReps(saved.lastReps || {});
       setLastEasy(saved.lastEasy || {});
       if (saved.settings) setSettings(saved.settings);
     } else {
@@ -360,8 +400,8 @@ function App() {
   /* salvar */
   useEffect(() => {
     if (!loaded) return;
-    setSaveError(!writeStore(STORE_KEY, { v: 4, data, history, lastLoads, lastEasy, settings }));
-  }, [loaded, data, history, lastLoads, lastEasy, settings]);
+    setSaveError(!writeStore(STORE_KEY, { v: 4, data, history, lastLoads, lastReps, lastEasy, settings }));
+  }, [loaded, data, history, lastLoads, lastReps, lastEasy, settings]);
 
   /* cronômetro de descanso (baseado em horário, não perde tempo em segundo plano) */
   useEffect(() => {
@@ -414,11 +454,12 @@ function App() {
     setData({ ...data, checked: { ...data.checked, [key]: !data.checked[key] } });
   };
   const setLoad = (key, value) => setData({ ...data, loads: { ...data.loads, [key]: value } });
+  const setReps = (key, value) => setData({ ...data, reps: { ...data.reps, [key]: value } });
   const toggleEasy = (ex) => setData({ ...data, easy: { ...data.easy, [ex.id]: !data.easy[ex.id] } });
 
   const clearDay = (dayId, base) => {
-    const next = { checked: { ...base.checked }, loads: { ...base.loads }, easy: { ...base.easy }, sessions: { ...base.sessions } };
-    ["checked", "loads", "easy"].forEach((k) => Object.keys(next[k]).forEach((key) => { if (key.startsWith(dayId + "|")) delete next[k][key]; }));
+    const next = { checked: { ...base.checked }, loads: { ...base.loads }, reps: { ...base.reps }, easy: { ...base.easy }, sessions: { ...base.sessions } };
+    ["checked", "loads", "reps", "easy"].forEach((k) => Object.keys(next[k]).forEach((key) => { if (key.startsWith(dayId + "|")) delete next[k][key]; }));
     PLAN.find((d) => d.id === dayId).exercises.forEach((ex) => delete next.easy[ex.id]);
     delete next.sessions[dayId];
     return next;
@@ -443,6 +484,11 @@ function App() {
       if (key.startsWith(day.id + "|") && data.loads[key]) nl[key.slice(day.id.length + 1)] = data.loads[key];
     });
     setLastLoads(nl);
+    const nr = { ...lastReps };
+    Object.keys(data.reps).forEach((key) => {
+      if (key.startsWith(day.id + "|") && data.reps[key]) nr[key.slice(day.id.length + 1)] = data.reps[key];
+    });
+    setLastReps(nr);
     const ne = { ...lastEasy };
     day.exercises.forEach((ex) => { if (data.easy[ex.id] !== undefined) ne[ex.id] = !!data.easy[ex.id]; });
     setLastEasy(ne);
@@ -547,11 +593,17 @@ function App() {
     const exDone = Array.from({ length: ex.sets }).filter((_, s) => data.checked[checkKey(day.id, ex.id, s)]).length;
     const complete = exDone === ex.sets;
     const showLoad = !ex.noLoad;
+    const verdict = exVerdict(ex, lastLoads, lastReps);
     const easySuggest = (key) => {
       const last = toNum(lastLoads[key]);
       if (last == null || !lastEasy[ex.id]) return null;
       return Math.round(last * 1.05 * 2) / 2;
     };
+    const warmKg = !ex.biset && lastLoads[lastKey(ex.id, 0)] ? Math.round(toNum(lastLoads[lastKey(ex.id, 0)]) * 0.6 * 2) / 2 : null;
+    const trend = verdict && (
+      verdict.action === "subir" ? `Na última vez, a série mais pesada fez ${verdict.R} repetições. Hoje suba a carga.`
+      : verdict.action === "diminuir" ? `Na última vez, a série mais pesada ficou em ${verdict.R} repetições, abaixo de ${verdict.lo}. Hoje reduza um pouco a carga.`
+      : `Na última vez, a série mais pesada fez ${verdict.R} repetições. Mantenha a carga e tente chegar a ${verdict.hi}.`);
     return (
       <div key={ex.id} className={"card" + (complete ? " complete" : "")}>
         <div className="ex-head">
@@ -566,6 +618,7 @@ function App() {
           </div>
         </div>
         {ex.cue && <p className="cue" style={{ marginLeft: 52 }}>{ex.cue}</p>}
+        {trend && <p className="trend" style={{ marginLeft: 52 }}>{trend}</p>}
 
         <div className="ex-body">
           {Array.from({ length: ex.warmup || 0 }).map((_, i) => {
@@ -573,7 +626,7 @@ function App() {
             return (
               <button key={i} className={"warm" + (on ? " on" : "")} aria-pressed={on} onClick={() => toggleWarm(ex, i)}>
                 <Ic.Heat />
-                <span className="grow">Aquecimento: 1 série leve, bem abaixo da carga de trabalho</span>
+                <span className="grow">Aquecimento: 1 série leve{warmKg != null ? `, cerca de ${fmtKg(warmKg)} kg` : ""}, 10 a 12 repetições</span>
                 {on && <Ic.Check s={14} />}
               </button>
             );
@@ -609,15 +662,18 @@ function App() {
                   </div>
                 ) : (() => {
                   const lk = lastKey(ex.id, setIdx);
-                  const sug = easySuggest(lk);
+                  const goal = targetLoad(verdict, lastLoads[lk]);
                   return (
                     <div className="load">
                       <input type="number" inputMode="decimal" placeholder="kg" name={`carga-${ex.id}-${setIdx}`} autoComplete="off" aria-label={`Carga da série ${setIdx + 1} de ${ex.name}, em quilos`}
                         value={data.loads[loadKey(day.id, ex.id, setIdx)] || ""}
                         onChange={(e) => setLoad(loadKey(day.id, ex.id, setIdx), e.target.value)} />
-                      <span className="unit">kg</span>
+                      <span className="x" aria-hidden="true">x</span>
+                      <input className="reps" type="number" inputMode="numeric" placeholder="rep" name={`reps-${ex.id}-${setIdx}`} autoComplete="off" aria-label={`Repetições da série ${setIdx + 1} de ${ex.name}`}
+                        value={data.reps[loadKey(day.id, ex.id, setIdx)] || ""}
+                        onChange={(e) => setReps(loadKey(day.id, ex.id, setIdx), e.target.value)} />
                       {lastLoads[lk] && (
-                        <span className="hint">últ. {fmtKg(lastLoads[lk])} kg{sug != null && <small>tente {fmtKg(sug)} kg</small>}</span>
+                        <span className="hint">últ. {fmtKg(lastLoads[lk])}{lastReps[lk] ? `x${lastReps[lk]}` : " kg"}{goal != null && <small>tente {fmtKg(goal)} kg</small>}</span>
                       )}
                     </div>
                   );
@@ -626,7 +682,7 @@ function App() {
             );
           })}
 
-          {showLoad && complete && (
+          {showLoad && ex.biset && complete && (
             <button className="easy" aria-pressed={!!data.easy[ex.id]} onClick={() => toggleEasy(ex)}>
               {data.easy[ex.id] ? "Marcado: foi leve, sobe na próxima" : "Foi leve? Marque para subir a carga"}
             </button>
@@ -690,6 +746,7 @@ function App() {
         </div>
       )}
 
+      <p className="breath"><strong>Carga:</strong> pode subir a cada série (aquecimento leve, depois sobe). Meta de 8 a 12 repetições. Fez 12 na série mais pesada: sobe na próxima vez. Ficou abaixo de 8: reduza. Entre 8 e 11: mantenha a carga e tente fazer mais uma repetição.</p>
       <p className="breath"><strong>Respiração:</strong> expire no esforço e não prenda o ar. Se der dor de cabeça forte, tontura, dor no peito ou falta de ar fora do normal, pare o treino.</p>
 
       {blocks.map((b, bi) => (
