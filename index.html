@@ -104,6 +104,7 @@
   .warm span.grow { flex: 1; }
   .set-row { display: flex; align-items: center; gap: 8px; }
   .set-row + .set-row { margin-top: 8px; }
+  .set-row:has(.biset) { align-items: flex-start; }
   .set-btn { width: 44px; height: 44px; border-radius: 10px; background: var(--navy-900); border: 1px solid var(--line); color: var(--ivory-70); font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .set-btn.on { background: var(--pos); border-color: var(--pos); color: var(--navy-900); }
   .load { display: flex; align-items: center; gap: 6px; min-width: 0; }
@@ -116,9 +117,9 @@
   .load input.reps { width: 52px; }
   .load .x { color: var(--ivory-50); font-size: 13px; }
   .trend { color: var(--gold-soft); font-size: 13px; margin: 6px 0 0; font-weight: 500; }
-  .biset { display: flex; flex-wrap: wrap; gap: 8px 12px; }
-  .biset .load input { width: 56px; }
-  .part { display: flex; flex-direction: column; font-size: 11px; color: var(--ivory-50); line-height: 1.2; max-width: 80px; }
+  .biset { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .part { display: flex; flex-direction: column; font-size: 11px; color: var(--ivory-50); line-height: 1.25; min-width: 0; }
+  .set-row .biset + * { margin-left: 0; }
   .easy { margin-top: 10px; min-height: 40px; padding: 0 14px; border-radius: 999px; background: transparent; border: 1px solid var(--line); color: var(--ivory-70); font-size: 12.5px; font-weight: 600; }
   .easy[aria-pressed="true"] { background: var(--gold); border-color: var(--gold); color: var(--navy-900); }
 
@@ -225,10 +226,9 @@ const PLAN = [
     { id: "abd-chao", loc: "casa", name: "Abdominal no chão", sets: 3, reps: "15-20", muscle: "abdomen", warmup: 0, rest: 45, noLoad: true, cue: "Suba devagar, sem puxar o pescoço." },
   ]},
   { id: "inf-a", label: "Inferior A", short: "Inf A", tag: "Perna e cardio", exercises: [
-    { id: "leg-press", loc: "academia", name: "Leg press", sets: 3, reps: "8-12", muscle: "quadriceps", warmup: 1, rest: 120, cue: "Lombar colada no banco. Não trave os joelhos no topo." },
+    { id: "leg-press", loc: "academia", name: "Leg press + Panturrilha no leg press (bi-set)", sets: 3, reps: "8-12", repsParts: ["8-12", "10-15"], muscle: "quadriceps", also: "panturrilha", warmup: 1, rest: 120, biset: ["Leg press", "Panturrilha"], cue: "Leg press e, logo em seguida, a panturrilha na mesma máquina, sem sair. Lombar colada no banco; não trave os joelhos." },
     { id: "mesa-flexora", loc: "academia", name: "Mesa flexora", sets: 3, reps: "8-12", muscle: "posterior", warmup: 0, rest: 90, cue: "Quadril colado no banco. Volte devagar." },
     { id: "extensora", loc: "academia", name: "Cadeira extensora", sets: 3, reps: "8-12", muscle: "quadriceps", warmup: 0, rest: 75, cue: "Segure 1 segundo no topo." },
-    { id: "pant-pe", loc: "academia", name: "Panturrilha em pé", sets: 3, reps: "10-15", muscle: "panturrilha", warmup: 0, rest: 60, cue: "Suba até o fim e desça alongando." },
     { id: "cardio-a", loc: "academia", name: "Esteira ou bike inclinada", sets: 1, reps: "12 min", muscle: "cardio", warmup: 0, rest: 0, noLoad: true, mins: 12, cue: "Ritmo em que ainda dá para conversar." },
     { id: "agacho-casa", loc: "casa", name: "Agachamento com o peso do corpo", sets: 3, reps: "12-15", muscle: "quadriceps", warmup: 0, rest: 60, noLoad: true, cue: "Sente para trás, como numa cadeira. Joelhos acompanham os pés." },
     { id: "ponte", loc: "casa", name: "Ponte de glúteo", sets: 3, reps: "12-15", muscle: "gluteo", warmup: 0, rest: 60, noLoad: true, cue: "Suba contraindo o glúteo, sem arquear a lombar." },
@@ -279,19 +279,20 @@ const warmKey = (dayId, exId, i) => `${dayId}|${exId}|w${i}`;
 const loadKey = (dayId, exId, setIdx, part) => `${dayId}|${exId}|${setIdx}${part === undefined ? "" : "|b" + part}`;
 const lastKey = (exId, setIdx, part) => `${exId}|${setIdx}${part === undefined ? "" : "|b" + part}`;
 
-function repRange(ex) {
-  const m = /(\d+)\s*-\s*(\d+)/.exec(ex.reps || "");
+function repRange(ex, part) {
+  const src = (part !== undefined && ex.repsParts && ex.repsParts[part]) || ex.reps || "";
+  const m = /(\d+)\s*-\s*(\d+)/.exec(src);
   return m ? [parseInt(m[1], 10), parseInt(m[2], 10)] : [8, 12];
 }
 function stepFor(load) { return load < 20 ? 1 : load < 60 ? 2.5 : 5; }
 /* dupla progressão: bateu o topo da faixa na série mais pesada, sobe; abaixo do piso, reduz; no meio, mantém */
-function exVerdict(ex, lastLoads, lastReps) {
-  if (ex.noLoad || ex.biset) return null;
-  const [lo, hi] = repRange(ex);
+function exVerdict(ex, lastLoads, lastReps, part) {
+  if (ex.noLoad) return null;
+  const [lo, hi] = repRange(ex, part);
   let top = null;
   for (let i = 0; i < ex.sets; i++) {
-    const L = toNum(lastLoads[lastKey(ex.id, i)]);
-    const R = toNum(lastReps[lastKey(ex.id, i)]);
+    const L = toNum(lastLoads[lastKey(ex.id, i, part)]);
+    const R = toNum(lastReps[lastKey(ex.id, i, part)]);
     if (L == null || R == null) continue;
     if (!top || L >= top.L) top = { L, R };
   }
@@ -525,7 +526,7 @@ function App() {
     canvas.width = W; canvas.height = H;
     try { await document.fonts.load('700 80px "Cormorant Garamond"'); await document.fonts.load('600 30px "Inter"'); } catch (e) {}
     const exCount = day.exercises.filter((e) => e.muscle !== "cardio").length;
-    const muscles = Array.from(new Set(day.exercises.map((e) => MUSCLE_LABEL[e.muscle]))).join(" · ");
+    const muscles = Array.from(new Set(day.exercises.flatMap((e) => [MUSCLE_LABEL[e.muscle], e.also && MUSCLE_LABEL[e.also]]).filter(Boolean))).join(" · ");
     const paint = () => {
       const g = ctx.createLinearGradient(0, H * 0.4, 0, H);
       g.addColorStop(0, "rgba(13,26,43,0)");
@@ -593,17 +594,38 @@ function App() {
     const exDone = Array.from({ length: ex.sets }).filter((_, s) => data.checked[checkKey(day.id, ex.id, s)]).length;
     const complete = exDone === ex.sets;
     const showLoad = !ex.noLoad;
-    const verdict = exVerdict(ex, lastLoads, lastReps);
-    const easySuggest = (key) => {
-      const last = toNum(lastLoads[key]);
-      if (last == null || !lastEasy[ex.id]) return null;
-      return Math.round(last * 1.05 * 2) / 2;
+    const parts = ex.biset ? ex.biset.map((_, i) => i) : [undefined];
+    const verdicts = parts.map((pi) => exVerdict(ex, lastLoads, lastReps, pi));
+    const trendFor = (v, name) => v && (
+      (name ? name + ": " : "") + (v.action === "subir" ? `a série mais pesada fez ${v.R} repetições. Hoje suba a carga.`
+      : v.action === "diminuir" ? `a série mais pesada ficou em ${v.R} repetições, abaixo de ${v.lo}. Hoje reduza um pouco a carga.`
+      : `a série mais pesada fez ${v.R} repetições. Mantenha a carga e tente chegar a ${v.hi}.`));
+    const trends = verdicts.map((v, i) => trendFor(v, ex.biset ? ex.biset[i] : null)).filter(Boolean);
+    const first = lastLoads[lastKey(ex.id, 0, ex.biset ? 0 : undefined)];
+    const warmKg = first ? Math.round(toNum(first) * 0.6 * 2) / 2 : null;
+    const loadRow = (setIdx, pi) => {
+      const part = pi === undefined ? undefined : pi;
+      const lk = lastKey(ex.id, setIdx, part);
+      const goal = targetLoad(verdicts[pi === undefined ? 0 : pi], lastLoads[lk]);
+      const label = pi === undefined ? "" : ex.biset[pi];
+      return (
+        <div key={pi === undefined ? "s" : pi} className="load">
+          <input type="number" inputMode="decimal" placeholder="kg" name={`carga-${ex.id}-${setIdx}-${pi === undefined ? 0 : pi}`} autoComplete="off"
+            aria-label={`Carga${label ? " de " + label : ""}, série ${setIdx + 1}, em quilos`}
+            value={data.loads[loadKey(day.id, ex.id, setIdx, part)] || ""}
+            onChange={(e) => setLoad(loadKey(day.id, ex.id, setIdx, part), e.target.value)} />
+          <span className="x" aria-hidden="true">x</span>
+          <input className="reps" type="number" inputMode="numeric" placeholder="rep" name={`reps-${ex.id}-${setIdx}-${pi === undefined ? 0 : pi}`} autoComplete="off"
+            aria-label={`Repetições${label ? " de " + label : ""}, série ${setIdx + 1}`}
+            value={data.reps[loadKey(day.id, ex.id, setIdx, part)] || ""}
+            onChange={(e) => setReps(loadKey(day.id, ex.id, setIdx, part), e.target.value)} />
+          <div className="part">
+            {label && <span>{label}</span>}
+            {lastLoads[lk] && <span className="hint">últ. {fmtKg(lastLoads[lk])}{lastReps[lk] ? `x${lastReps[lk]}` : " kg"}{goal != null && <small>tente {fmtKg(goal)} kg</small>}</span>}
+          </div>
+        </div>
+      );
     };
-    const warmKg = !ex.biset && lastLoads[lastKey(ex.id, 0)] ? Math.round(toNum(lastLoads[lastKey(ex.id, 0)]) * 0.6 * 2) / 2 : null;
-    const trend = verdict && (
-      verdict.action === "subir" ? `Na última vez, a série mais pesada fez ${verdict.R} repetições. Hoje suba a carga.`
-      : verdict.action === "diminuir" ? `Na última vez, a série mais pesada ficou em ${verdict.R} repetições, abaixo de ${verdict.lo}. Hoje reduza um pouco a carga.`
-      : `Na última vez, a série mais pesada fez ${verdict.R} repetições. Mantenha a carga e tente chegar a ${verdict.hi}.`);
     return (
       <div key={ex.id} className={"card" + (complete ? " complete" : "")}>
         <div className="ex-head">
@@ -613,12 +635,13 @@ function App() {
             <div className="ex-meta">
               <span className="tnum">{ex.sets > 1 || !ex.mins ? `${ex.sets}x ${ex.reps}` : ex.reps}</span>
               <span className="pill">{MUSCLE_LABEL[ex.muscle]}</span>
+              {ex.also && <span className="pill">{MUSCLE_LABEL[ex.also]}</span>}
               {ex.rest > 0 && <span className="tnum">descanso {fmtRest(ex.rest)}</span>}
             </div>
           </div>
         </div>
         {ex.cue && <p className="cue" style={{ marginLeft: 52 }}>{ex.cue}</p>}
-        {trend && <p className="trend" style={{ marginLeft: 52 }}>{trend}</p>}
+        {trends.map((t, i) => <p key={i} className="trend" style={{ marginLeft: 52 }}>{trends.length > 1 ? t : "Na última vez, " + t}</p>)}
 
         <div className="ex-body">
           {Array.from({ length: ex.warmup || 0 }).map((_, i) => {
@@ -641,52 +664,12 @@ function App() {
                   onClick={() => toggleSet(ex, setIdx)}>
                   {on ? <Ic.Check s={18} /> : setIdx + 1}
                 </button>
-                {showLoad && (ex.biset ? (
-                  <div className="biset">
-                    {ex.biset.map((part, pi) => {
-                      const lk = lastKey(ex.id, setIdx, pi);
-                      const sug = easySuggest(lk);
-                      return (
-                        <div key={pi} className="load">
-                          <input type="number" inputMode="decimal" placeholder="kg" name={`carga-${ex.id}-${setIdx}-${pi}`} autoComplete="off" aria-label={`Carga de ${part}, série ${setIdx + 1}, em quilos`}
-                            value={data.loads[loadKey(day.id, ex.id, setIdx, pi)] || ""}
-                            onChange={(e) => setLoad(loadKey(day.id, ex.id, setIdx, pi), e.target.value)} />
-                          <div className="part">
-                            <span>{part}</span>
-                            {lastLoads[lk] && <span className="hint">últ. {fmtKg(lastLoads[lk])} kg</span>}
-                            {sug != null && <span className="hint">tente {fmtKg(sug)} kg</span>}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (() => {
-                  const lk = lastKey(ex.id, setIdx);
-                  const goal = targetLoad(verdict, lastLoads[lk]);
-                  return (
-                    <div className="load">
-                      <input type="number" inputMode="decimal" placeholder="kg" name={`carga-${ex.id}-${setIdx}`} autoComplete="off" aria-label={`Carga da série ${setIdx + 1} de ${ex.name}, em quilos`}
-                        value={data.loads[loadKey(day.id, ex.id, setIdx)] || ""}
-                        onChange={(e) => setLoad(loadKey(day.id, ex.id, setIdx), e.target.value)} />
-                      <span className="x" aria-hidden="true">x</span>
-                      <input className="reps" type="number" inputMode="numeric" placeholder="rep" name={`reps-${ex.id}-${setIdx}`} autoComplete="off" aria-label={`Repetições da série ${setIdx + 1} de ${ex.name}`}
-                        value={data.reps[loadKey(day.id, ex.id, setIdx)] || ""}
-                        onChange={(e) => setReps(loadKey(day.id, ex.id, setIdx), e.target.value)} />
-                      {lastLoads[lk] && (
-                        <span className="hint">últ. {fmtKg(lastLoads[lk])}{lastReps[lk] ? `x${lastReps[lk]}` : " kg"}{goal != null && <small>tente {fmtKg(goal)} kg</small>}</span>
-                      )}
-                    </div>
-                  );
-                })())}
+                {showLoad && (ex.biset
+                  ? <div className="biset">{ex.biset.map((_, pi) => loadRow(setIdx, pi))}</div>
+                  : loadRow(setIdx, undefined))}
               </div>
             );
           })}
-
-          {showLoad && ex.biset && complete && (
-            <button className="easy" aria-pressed={!!data.easy[ex.id]} onClick={() => toggleEasy(ex)}>
-              {data.easy[ex.id] ? "Marcado: foi leve, sobe na próxima" : "Foi leve? Marque para subir a carga"}
-            </button>
-          )}
         </div>
       </div>
     );
