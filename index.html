@@ -200,7 +200,7 @@ const MuscleIcon = ({ group, size = 20 }) => {
     case "peito": return <svg {...c}><path {...st} d="M12 4c-2.5-2-6.5-1-7.5 2.5C3.5 10 5 14 12 18c7-4 8.5-8 7.5-11.5C18.5 3 14.5 2 12 4z"/></svg>;
     case "costas": return <svg {...c}><path {...st} d="M12 3v18M8 6c-2 2-3 5-2 8 1 2 2 3 2 5M16 6c2 2 3 5 2 8-1 2-2 3-2 5"/></svg>;
     case "ombro": return <svg {...c}><circle {...st} cx="7" cy="8" r="3"/><circle {...st} cx="17" cy="8" r="3"/><path {...st} d="M7 11c0 4 2 7 5 9 3-2 5-5 5-9"/></svg>;
-    case "braco": return <svg {...c}><path {...st} d="M6 5c2 1 3 3 3 5 3 0 5-1 7-3M9 10c0 4 2 7 5 9"/></svg>;
+    case "braco": case "biceps": case "triceps": return <svg {...c}><path {...st} d="M6 5c2 1 3 3 3 5 3 0 5-1 7-3M9 10c0 4 2 7 5 9"/></svg>;
     case "quadriceps": return <svg {...c}><path {...st} d="M9 3c-1 4-1 8-2 11-1 2-2 4-1 7h4c0-3 1-5 2-7 1 2 2 4 2 7h4c1-3 0-5-1-7-1-3-1-7-2-11"/></svg>;
     case "posterior": return <svg {...c}><path {...st} d="M12 3v6M7 9c-1 3-1 6 0 9 1 2 2 2 2 3h2c0-2 0-4 1-6 1 2 1 4 1 6h2c0-1 1-1 2-3 1-3 1-6 0-9"/></svg>;
     case "panturrilha": return <svg {...c}><path {...st} d="M10 3c0 5-1 8-3 11-1 2-1 4 0 7h3c1-4 1-6 2-9 1 3 1 5 2 9h3c1-3 1-5 0-7-2-3-3-6-3-11"/></svg>;
@@ -210,7 +210,7 @@ const MuscleIcon = ({ group, size = 20 }) => {
     default: return <svg {...c}><circle {...st} cx="12" cy="12" r="8"/></svg>;
   }
 };
-const MUSCLE_LABEL = { peito: "Peito", costas: "Costas", ombro: "Ombro", braco: "Braço", quadriceps: "Quadríceps", posterior: "Posterior de coxa", panturrilha: "Panturrilha", gluteo: "Glúteo", cardio: "Cardio", abdomen: "Abdômen" };
+const MUSCLE_LABEL = { peito: "Peito", costas: "Costas", ombro: "Ombro", braco: "Braço", biceps: "Bíceps", triceps: "Tríceps", quadriceps: "Quadríceps", posterior: "Posterior de coxa", panturrilha: "Panturrilha", gluteo: "Glúteo", cardio: "Cardio", abdomen: "Abdômen" };
 const LOC_LABEL = { casa: "Em casa", academia: "Na academia" };
 
 /* ---------- Plano ----------
@@ -222,7 +222,8 @@ const PLAN = [
     { id: "puxada", loc: "academia", name: "Puxada na frente (pulley)", sets: 3, reps: "8-12", muscle: "costas", warmup: 1, rest: 120, cue: "Puxe com os cotovelos, sem balançar o tronco." },
     { id: "desenv", loc: "academia", name: "Desenvolvimento de ombro (máquina)", sets: 3, reps: "8-12", muscle: "ombro", warmup: 0, rest: 90, cue: "Costas apoiadas, sem arquear a lombar." },
     { id: "remada-baixa", loc: "academia", name: "Remada baixa", sets: 3, reps: "8-12", muscle: "costas", warmup: 0, rest: 90, cue: "Peito aberto e tronco firme. Não puxe com a lombar." },
-    { id: "bi-rosca-triceps", loc: "academia", name: "Rosca direta + Tríceps corda (bi-set)", sets: 3, reps: "8-12", muscle: "braco", warmup: 0, rest: 75, biset: ["Rosca direta", "Tríceps corda"], cue: "Faça um, depois o outro, sem descanso no meio." },
+    { id: "rosca", loc: "academia", name: "Rosca direta", sets: 3, reps: "8-12", muscle: "biceps", warmup: 1, rest: 75, cue: "Cotovelos colados ao corpo, sem balançar o tronco." },
+    { id: "triceps-corda", loc: "academia", name: "Tríceps na corda (polia)", sets: 3, reps: "8-12", muscle: "triceps", warmup: 1, rest: 75, cue: "Cotovelos fixos ao lado do corpo; abra a corda no final." },
     { id: "abd-chao", loc: "casa", name: "Abdominal no chão", sets: 3, reps: "15-20", muscle: "abdomen", warmup: 0, rest: 45, noLoad: true, cue: "Suba devagar, sem puxar o pescoço." },
   ]},
   { id: "inf-a", label: "Inferior A", short: "Inf A", tag: "Perna e cardio", exercises: [
@@ -239,7 +240,8 @@ const PLAN = [
     { id: "remada-maq", loc: "academia", name: "Remada na máquina (peito apoiado)", sets: 3, reps: "8-12", muscle: "costas", warmup: 1, rest: 120, cue: "Peito apoiado poupa a lombar. Junte as escápulas." },
     { id: "elev-lat", loc: "academia", name: "Elevação lateral", sets: 3, reps: "8-12", muscle: "ombro", warmup: 0, rest: 75, cue: "Carga leve, subida controlada até a altura do ombro." },
     { id: "puxada-tri", loc: "academia", name: "Puxada triângulo", sets: 3, reps: "8-12", muscle: "costas", warmup: 0, rest: 90, cue: "Leve o peito até a barra." },
-    { id: "bi-triceps-rosca", loc: "academia", name: "Tríceps pulley + Rosca alternada (bi-set)", sets: 3, reps: "8-12", muscle: "braco", warmup: 0, rest: 75, biset: ["Tríceps pulley", "Rosca alternada"], cue: "Faça um, depois o outro, sem descanso no meio." },
+    { id: "triceps-pulley", loc: "academia", name: "Tríceps na polia", sets: 3, reps: "8-12", muscle: "triceps", warmup: 1, rest: 75, cue: "Cotovelos fixos ao lado do corpo, extensão completa." },
+    { id: "rosca-alt", loc: "academia", name: "Rosca alternada (halteres)", sets: 3, reps: "8-12", muscle: "biceps", warmup: 1, rest: 75, cue: "Gire o punho na subida e desça devagar." },
     { id: "abd-obl", loc: "casa", name: "Abdominal oblíquo (bicicleta)", sets: 3, reps: "15-20", muscle: "abdomen", warmup: 0, rest: 45, noLoad: true, cue: "Cotovelo em direção ao joelho oposto, devagar." },
   ]},
   { id: "inf-b", label: "Inferior B", short: "Inf B", tag: "Perna e cardio", exercises: [
