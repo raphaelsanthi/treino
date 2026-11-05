@@ -59,8 +59,8 @@
   .next .name { font-size: 18px; font-weight: 600; margin-top: 2px; }
   .next .meta { color: var(--ivory-70); font-size: 13px; margin-top: 2px; }
 
-  .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px; }
-  .tab { position: relative; padding: 12px 4px; min-height: 48px; border-radius: 12px; background: var(--navy-800); border: 1px solid var(--line); color: var(--ivory-70); font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 4px; }
+  .tabs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 20px; }
+  .tab { position: relative; padding: 12px 2px; min-height: 48px; border-radius: 12px; background: var(--navy-800); border: 1px solid var(--line); color: var(--ivory-70); font-size: 11px; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 4px; }
   .tab[aria-selected="true"] { background: var(--gold); border-color: var(--gold); color: var(--navy-900); }
   .tab.done:not([aria-selected="true"]) { background: var(--pos-bg); border-color: rgba(143,191,159,.4); color: var(--pos); }
 
@@ -164,6 +164,18 @@
   .two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .two .btn + .btn { margin-top: 0; }
   .fld-label { font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ivory-50); font-weight: 600; margin: 0 0 8px; }
+  .swim-in { display: flex; align-items: center; gap: 10px; margin: 12px 0; }
+  .swim-in input { height: 52px; border-radius: 10px; background: var(--navy-900); border: 1px solid var(--line); color: var(--ivory); text-align: center; font-size: 20px; font-weight: 600; }
+  .swim-in input:focus { border-color: var(--gold); }
+  .swim-in .laps { width: 110px; }
+  .swim-in .date { flex: 1; min-width: 0; font-size: 16px; font-weight: 500; color-scheme: dark; }
+  .swim-calc { font-size: 15px; color: var(--ivory-70); margin: 0 0 14px; }
+  .swim-calc strong { color: var(--gold-soft); font-size: 22px; }
+  .swim-li { display: flex; align-items: center; gap: 8px; font-size: 14px; background: var(--navy-900); border-radius: 10px; padding: 6px 6px 6px 12px; }
+  .swim-li + .swim-li { margin-top: 6px; }
+  .swim-li .grow { flex: 1; }
+  .swim-li .r { color: var(--pos); font-size: 13px; font-weight: 700; }
+  .swim-li .del { width: 40px; height: 40px; border-radius: 8px; background: transparent; color: var(--ivory-50); display: flex; align-items: center; justify-content: center; }
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
@@ -275,6 +287,14 @@ function fmtRest(s) {
   const m = Math.floor(s / 60), r = s % 60;
   return r ? `${m} min ${r} s` : `${m} min`;
 }
+const POOL_M = 25; // piscina do condomínio: cada volta = 25 m
+function weekStart(iso) {
+  const d = new Date(iso + "T00:00:00");
+  d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); // segunda-feira
+  const p = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+function fmtMeters(m) { return `${String(m).replace(".", ",")} m`; }
 function toNum(v) { const n = parseFloat(String(v).replace(",", ".")); return isNaN(n) ? null : n; }
 
 const checkKey = (dayId, exId, setIdx) => `${dayId}|${exId}|s${setIdx}`;
@@ -357,6 +377,10 @@ function App() {
   const [lastReps, setLastReps] = useState({});
   const [lastEasy, setLastEasy] = useState({});
   const [settings, setSettings] = useState({ first: "academia" });
+  const [swims, setSwims] = useState([]); // { id, date, laps }
+  const [swimView, setSwimView] = useState(false);
+  const [swimLaps, setSwimLaps] = useState("");
+  const [swimDate, setSwimDate] = useState(todayStr());
   const [activeDay, setActiveDay] = useState(0);
   const [saveError, setSaveError] = useState(false);
 
@@ -391,6 +415,7 @@ function App() {
       setLastReps(saved.lastReps || {});
       setLastEasy(saved.lastEasy || {});
       if (saved.settings) setSettings(saved.settings);
+      if (Array.isArray(saved.swims)) setSwims(saved.swims);
     } else {
       // migra apenas o histórico de sessões da v3 (cargas mudam com a nova lista de exercícios)
       const old = readStore(OLD_HISTORY_KEY);
@@ -404,8 +429,8 @@ function App() {
   /* salvar */
   useEffect(() => {
     if (!loaded) return;
-    setSaveError(!writeStore(STORE_KEY, { v: 4, data, history, lastLoads, lastReps, lastEasy, settings }));
-  }, [loaded, data, history, lastLoads, lastReps, lastEasy, settings]);
+    setSaveError(!writeStore(STORE_KEY, { v: 4, data, history, lastLoads, lastReps, lastEasy, settings, swims }));
+  }, [loaded, data, history, lastLoads, lastReps, lastEasy, settings, swims]);
 
   /* cronômetro de descanso (baseado em horário, não perde tempo em segundo plano) */
   useEffect(() => {
@@ -444,6 +469,21 @@ function App() {
   const finishedToday = (history[day.id] || []).some((e) => e.date === today);
   const nextIdx = nextDayIndex(history);
   const phase = phaseInfo(today);
+
+  const lapsNum = toNum(swimLaps);
+  const lapsOk = lapsNum != null && lapsNum > 0;
+  const addSwim = () => {
+    if (!lapsOk || !swimDate) return;
+    setSwims((prev) => [...prev, { id: Date.now(), date: swimDate, laps: lapsNum }].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : a.id - b.id)));
+    setSwimLaps("");
+  };
+  const delSwim = (id) => {
+    if (!window.confirm("Apagar este registro de natação?")) return;
+    setSwims((prev) => prev.filter((s) => s.id !== id));
+  };
+  const weekSwims = swims.filter((s) => weekStart(s.date) === weekStart(today));
+  const weekMeters = weekSwims.reduce((a, s) => a + s.laps * POOL_M, 0);
+  const swimDoneToday = swims.some((s) => s.date === today);
 
   const toggleSet = (ex, setIdx) => {
     const key = checkKey(day.id, ex.id, setIdx);
@@ -699,14 +739,52 @@ function App() {
         {PLAN.map((d, i) => {
           const doneToday = (history[d.id] || []).some((e) => e.date === today);
           return (
-            <button key={d.id} role="tab" aria-selected={i === activeDay}
-              className={"tab" + (doneToday ? " done" : "")} onClick={() => setActiveDay(i)}>
+            <button key={d.id} role="tab" aria-selected={!swimView && i === activeDay}
+              className={"tab" + (doneToday ? " done" : "")} onClick={() => { setSwimView(false); setActiveDay(i); }}>
               {doneToday && <Ic.Check s={12} />}{d.short}
             </button>
           );
         })}
+        <button role="tab" aria-selected={swimView} className={"tab" + (swimDoneToday ? " done" : "")} onClick={() => setSwimView(true)}>
+          {swimDoneToday && <Ic.Check s={12} />}Natação
+        </button>
       </nav>
 
+      {swimView && (
+        <section aria-label="Natação">
+          <div className="day-head">
+            <span className="tag">Natação · piscina de {POOL_M} m</span>
+            <span className="count tnum">{weekSwims.length} {weekSwims.length === 1 ? "treino" : "treinos"} na semana</span>
+          </div>
+          <p className="breath"><strong>Como usar:</strong> ao terminar, digite quantas voltas você deu. Cada volta vale {POOL_M} metros e o total é calculado na hora.</p>
+          <div className="fld-label">Voltas e data</div>
+          <div className="swim-in">
+            <input className="laps tnum" type="number" inputMode="numeric" min="1" placeholder="voltas" name="voltas" autoComplete="off" aria-label="Quantidade de voltas"
+              value={swimLaps} onChange={(e) => setSwimLaps(e.target.value)} />
+            <input className="date" type="date" name="data-natacao" aria-label="Data da natação" value={swimDate} max={today} onChange={(e) => setSwimDate(e.target.value)} />
+          </div>
+          <p className="swim-calc tnum" aria-live="polite">{lapsOk ? <><strong>{fmtMeters(lapsNum * POOL_M)}</strong> ({lapsNum} voltas × {POOL_M} m)</> : "Total: digite as voltas para ver os metros."}</p>
+          <button className="btn gold" disabled={!lapsOk || !swimDate} style={!lapsOk || !swimDate ? { opacity: 0.45 } : null} onClick={addSwim}>Registrar natação</button>
+
+          <div className="sum" style={{ marginTop: 20 }}>
+            <div className="k" style={{ fontSize: 10.5, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ivory-50)", fontWeight: 600, marginBottom: 2 }}>Esta semana (segunda a domingo)</div>
+            <div className="big tnum">{fmtMeters(weekMeters)}</div>
+            <div className="d">{weekSwims.length === 0 ? "Nenhuma natação registrada ainda." : `${weekSwims.reduce((a, s) => a + s.laps, 0)} voltas em ${weekSwims.length} ${weekSwims.length === 1 ? "treino" : "treinos"}`}</div>
+          </div>
+
+          <div className="fld-label">Últimas natações</div>
+          {swims.length === 0 ? <p className="empty">Nada registrado ainda.</p> : swims.slice().reverse().slice(0, 15).map((s) => (
+            <div key={s.id} className="swim-li">
+              <span className="grow">{formatDate(s.date)}</span>
+              <span className="tnum">{s.laps} voltas</span>
+              <span className="r tnum">{fmtMeters(s.laps * POOL_M)}</span>
+              <button className="del" onClick={() => delSwim(s.id)} aria-label={`Apagar natação de ${formatDate(s.date)}`}><Ic.X s={14} /></button>
+            </div>
+          ))}
+        </section>
+      )}
+
+      {!swimView && <>
       <section aria-label={day.label}>
         <div className="day-head">
           <span className="tag">{day.label} · {day.tag}</span>
@@ -750,6 +828,7 @@ function App() {
         <button className="link-btn" onClick={resetDay}><Ic.Reset /> Reiniciar treino de hoje</button>
         {finishedToday && <div className="done-msg"><Ic.Check s={14} /> Feito hoje</div>}
       </div>
+      </>}
 
       {saveError && <p className="error" role="alert">Não consegui salvar neste navegador. O progresso pode se perder se você fechar a página.</p>}
       {!loaded && <p className="sub" style={{ marginTop: 16 }}>Carregando…</p>}
